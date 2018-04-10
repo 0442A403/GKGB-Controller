@@ -13,16 +13,20 @@ import kotlinx.android.synthetic.main.activity_controller.*
 
 
 class ControllerActivity: Activity(), SocketCallback {
-    val wifiSocket = WifiSocket(intent.getStringExtra("host"), intent.getIntExtra("port", -1), this)
+    private var wifiSocket: WifiSocket? = null
     var connectionSignal = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        wifiSocket = WifiSocket(intent.getStringExtra("host"),
+                intent.getIntExtra("port", -1),
+                this)
+        wifiSocket!!.execute()
         setContentView(R.layout.activity_controller)
         val commands = arrayOf(Command("Sit", Task.Sit))
         buttonPanel.adapter = TaskButtonAdapter(commands, this)
         buttonPanel.setOnItemClickListener { adapterView, _, i, _ ->
-            while (!connectionSignal);
-            wifiSocket.setTask((adapterView.getItemAtPosition(i) as Command).task)
+            while (!connectionSignal)
+            wifiSocket!!.setTask((adapterView.getItemAtPosition(i) as Command).task)
         }
     }
 

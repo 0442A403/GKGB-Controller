@@ -25,7 +25,9 @@ class WifiSocket(private val host: String,
     override fun doInBackground(vararg p0: Void?): Void? {
         try {
             socket = Socket()
+            Log.i("IUPPSocket", "Creating socket")
             socket!!.connect(InetSocketAddress(host, port), timeout)
+            Log.i("IUPPSocket", "Socket connected")
 
             inStream = BufferedReader(InputStreamReader(socket!!.getInputStream()))
             outStream = socket!!.getOutputStream()
@@ -46,11 +48,16 @@ class WifiSocket(private val host: String,
             }
             while (connectionSignal && !checkConnection) {
                 val msg = inStream!!.readLine()
-                onProgressUpdate(msg)
+                Log.i("IUPPSocket", "Socket connected")
+                onProgressUpdate("lala")
                 if (actualTask != null) {
                     outStream!!.write(actualTask!!.code)
                     actualTask = null
                 }
+            }
+            if (checkConnection) {
+                onProgressUpdate(connectedMsg)
+                return null;
             }
         } catch (e: Exception) {
             callback.callback(SocketCode.ConnectionErrorCode)
@@ -66,17 +73,18 @@ class WifiSocket(private val host: String,
 
     override fun onProgressUpdate(vararg values: String?) {
         super.onProgressUpdate(*values)
+        Log.i("SocketInformation", values[0])
         if (values.isEmpty())
             return
         val msg = values[0]
         when (msg) {
-            connectedMsg -> callback.callback(SocketCode.ConnectionCompletedCode)
+            connectedMsg ->
+                callback.callback(SocketCode.ConnectionCompletedCode)
             disconnectedMsg -> {
                 callback.callback(SocketCode.DisconnectedCode)
                 connectionSignal = false
             }
         }
-        Log.i("SocketInformation", values[0])
     }
 
     fun setTask(task: Task) {
