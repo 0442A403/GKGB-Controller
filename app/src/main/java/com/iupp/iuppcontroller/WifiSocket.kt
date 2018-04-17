@@ -13,7 +13,7 @@ class WifiSocket(private val host: String,
                  private val port: Int,
                  private var callback: SocketCallback,
                  private val checkConnection: Boolean = false): AsyncTask<Void, String, Void>(), Serializable {
-    private val timeout = 5000
+    private val timeout = 10000
     private var socket: Socket? = null
     private var inStream: BufferedReader? = null
     private var outStream: OutputStream? = null
@@ -25,22 +25,25 @@ class WifiSocket(private val host: String,
     override fun doInBackground(vararg p0: Void?): Void? {
         try {
             socket = Socket()
-            Log.i("IUPPSocket", "Creating socket")
+            Log.i("IUPPSocket", "Creating socket with params: host - $host, port - $port")
             socket!!.connect(InetSocketAddress(host, port), timeout)
             Log.i("IUPPSocket", "Socket connected")
 
             inStream = BufferedReader(InputStreamReader(socket!!.getInputStream()))
+            Log.i("IUPP", "1")
             outStream = socket!!.getOutputStream()
+            Log.i("IUPP", "2")
 
             if (socket!!.isConnected) {
-                val startTime = System.currentTimeMillis()
-                while (!inStream!!.ready()) {
-                    if (System.currentTimeMillis() - startTime > timeout) {
-                        callback.callback(SocketCode.TimeoutErrorCode)
-                        return null
-                    }
-                }
+//                val startTime = System.currentTimeMillis()
+//                while (!inStream!!.ready()) {
+//                    if (System.currentTimeMillis() - startTime > timeout) {
+//                        callback.callback(SocketCode.TimeoutErrorCode)
+//                        return null
+//                    }
+//                }
                 connection = true
+                Log.i("IUPP", "4")
             }
             else {
                 callback.callback(SocketCode.ConnectionErrorCode)
@@ -55,6 +58,7 @@ class WifiSocket(private val host: String,
                 }
             }
             if (checkConnection) {
+                Log.i("IUPP", "345")
                 onProgressUpdate(connectedMsg)
                 return null;
             }
@@ -77,8 +81,11 @@ class WifiSocket(private val host: String,
             return
         val msg = values[0]
         when (msg) {
-            connectedMsg ->
+            connectedMsg -> {
+                Log.i("SocketInformation", "I'm here")
                 callback.callback(SocketCode.ConnectionCompletedCode)
+
+            }
             disconnectedMsg -> {
                 callback.callback(SocketCode.DisconnectedCode)
                 connection = false

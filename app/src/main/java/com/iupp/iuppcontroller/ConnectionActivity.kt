@@ -21,8 +21,9 @@ class ConnectionActivity : AppCompatActivity(), SocketCallback {
     }
 
     override fun callback(code: SocketCode) {
+        Log.i("IUPP", "callback ${code.name}")
         connect_button.isClickable = true
-        if (code == SocketCode.ConnectionCompletedCode)
+        if (code == SocketCode.ConnectionCompletedCode) {
             runOnUiThread {
                 startActivity(
                         Intent(this, ControllerActivity::class.java).apply {
@@ -31,6 +32,7 @@ class ConnectionActivity : AppCompatActivity(), SocketCallback {
                         }
                 )
             }
+        }
         else if (code == SocketCode.ConnectionErrorCode
                 || code == SocketCode.TimeoutErrorCode
                 || code == SocketCode.RuntimeConnectionErrorCode) {

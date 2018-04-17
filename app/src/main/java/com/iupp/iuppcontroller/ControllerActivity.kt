@@ -45,17 +45,19 @@ class ControllerActivity: Activity(), SocketCallback {
 
     override fun callback(code: SocketCode) {
         Log.i("IUPPInformation", "callback")
-        if (code == SocketCode.ConnectionCompletedCode) {
-            Toast.makeText(this, "Сокет успешно создан!", Toast.LENGTH_SHORT).show()
-            connectionSignal = true
-        } else if (code == SocketCode.RuntimeConnectionErrorCode
-                || code == SocketCode.DisconnectedCode) {
-            Toast.makeText(this, "Соединение разорвано", Toast.LENGTH_LONG).show()
-            finish()
-        } else if (code == SocketCode.TimeoutErrorCode
-                || code == SocketCode.ConnectionErrorCode) {
-            Toast.makeText(this, "Не удалось подключиться", Toast.LENGTH_LONG).show()
-            finish()
+        runOnUiThread {
+            if (code == SocketCode.ConnectionCompletedCode) {
+                Toast.makeText(this, "Сокет успешно создан!", Toast.LENGTH_SHORT).show()
+                connectionSignal = true
+            } else if (code == SocketCode.RuntimeConnectionErrorCode
+                    || code == SocketCode.DisconnectedCode) {
+                Toast.makeText(this, "Соединение разорвано", Toast.LENGTH_LONG).show()
+                finish()
+            } else if (code == SocketCode.TimeoutErrorCode
+                    || code == SocketCode.ConnectionErrorCode) {
+                Toast.makeText(this, "Не удалось подключиться", Toast.LENGTH_LONG).show()
+                finish()
+            }
         }
     }
 }
