@@ -47,9 +47,8 @@ class WifiSocket(private val host: String,
                 return null
             }
             while (connection && !checkConnection) {
-                val msg = inStream!!.readLine()
-                Log.i("IUPPSocket", "Socket connected")
-                onProgressUpdate("lala")
+                val msg = inStream!!.readText()
+                Log.i("WifiSocket", "Message: $msg")
                 if (actualTask != null) {
                     outStream!!.write(actualTask!!.code)
                     actualTask = null

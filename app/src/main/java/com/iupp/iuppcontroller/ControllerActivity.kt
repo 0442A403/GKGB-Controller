@@ -26,6 +26,11 @@ class ControllerActivity: Activity(), SocketCallback {
         buttonPanel.setSettings()
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        wifiSocket?.disconnect()
+    }
+
     private fun GridView.setSettings() {
         val commands = arrayOf(Command("Sit", Task.Sit))
         this.adapter = TaskButtonAdapter(commands, this@ControllerActivity)
@@ -36,11 +41,6 @@ class ControllerActivity: Activity(), SocketCallback {
         this.numColumns = 3
         this.verticalSpacing = 5
         this.horizontalSpacing = 5
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        wifiSocket?.disconnect()
     }
 
     override fun callback(code: SocketCode) {
