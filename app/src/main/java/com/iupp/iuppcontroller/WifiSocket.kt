@@ -20,7 +20,7 @@ class WifiSocket(private val host: String,
     private val pingMsg = "SOCKET_PING"
     private val connectedMsg = "SOCKET_CONNECTED"
     private val disconnectedMsg = "SOCKET_DISCONNECTED"
-    private var connectionSignal = false
+    private var connection = false
     private var actualTask: Task? = null
     override fun doInBackground(vararg p0: Void?): Void? {
         try {
@@ -40,13 +40,13 @@ class WifiSocket(private val host: String,
                         return null
                     }
                 }
-                connectionSignal = true
+                connection = true
             }
             else {
                 callback.callback(SocketCode.ConnectionErrorCode)
                 return null
             }
-            while (connectionSignal && !checkConnection) {
+            while (connection && !checkConnection) {
                 val msg = inStream!!.readLine()
                 Log.i("IUPPSocket", "Socket connected")
                 onProgressUpdate("lala")
@@ -82,12 +82,16 @@ class WifiSocket(private val host: String,
                 callback.callback(SocketCode.ConnectionCompletedCode)
             disconnectedMsg -> {
                 callback.callback(SocketCode.DisconnectedCode)
-                connectionSignal = false
+                connection = false
             }
         }
     }
 
     fun setTask(task: Task) {
         actualTask = task
+    }
+
+    fun disconnect() {
+        connection = false
     }
 }

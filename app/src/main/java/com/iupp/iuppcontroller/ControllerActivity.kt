@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.Button
+import android.widget.GridView
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_controller.*
 
@@ -22,12 +23,24 @@ class ControllerActivity: Activity(), SocketCallback {
                 this)
         wifiSocket!!.execute()
         setContentView(R.layout.activity_controller)
+        buttonPanel.setSettings()
+    }
+
+    private fun GridView.setSettings() {
         val commands = arrayOf(Command("Sit", Task.Sit))
-        buttonPanel.adapter = TaskButtonAdapter(commands, this)
-        buttonPanel.setOnItemClickListener { adapterView, _, i, _ ->
+        this.adapter = TaskButtonAdapter(commands, this@ControllerActivity)
+        this.setOnItemClickListener { adapterView, _, i, _ ->
             while (!connectionSignal)
-            wifiSocket!!.setTask((adapterView.getItemAtPosition(i) as Command).task)
+                wifiSocket!!.setTask((adapterView.getItemAtPosition(i) as Command).task)
         }
+        this.numColumns = 3
+        this.verticalSpacing = 5
+        this.horizontalSpacing = 5
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        wifiSocket?.disconnect()
     }
 
     override fun callback(code: SocketCode) {
