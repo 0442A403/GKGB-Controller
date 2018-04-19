@@ -21,7 +21,7 @@ class ConnectionActivity : AppCompatActivity(), SocketCallback {
     }
 
     override fun callback(code: SocketCode) {
-        Log.i("IUPP", "callback ${code.name}")
+        Log.i("IUPPCallback", "callback ${code.name}")
         connect_button.isClickable = true
         if (code == SocketCode.ConnectionCompletedCode) {
             runOnUiThread {
@@ -36,7 +36,7 @@ class ConnectionActivity : AppCompatActivity(), SocketCallback {
         else if (code == SocketCode.ConnectionErrorCode
                 || code == SocketCode.TimeoutErrorCode
                 || code == SocketCode.RuntimeConnectionErrorCode) {
-            Log.i("SocketError", code.name)
+            Log.i("IUPPError", code.name)
             runOnUiThread {
                 Toast.makeText(this@ConnectionActivity, "Не удалось подключиться", Toast.LENGTH_LONG).show()
             }

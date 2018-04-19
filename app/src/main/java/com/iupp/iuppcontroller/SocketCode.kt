@@ -5,5 +5,5 @@ enum class SocketCode {
     TimeoutErrorCode,
     RuntimeConnectionErrorCode,
     ConnectionCompletedCode,
-    DisconnectedCode
+    DisconnectionCode
 }
