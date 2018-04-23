@@ -1,5 +1,7 @@
 package com.iupp.iuppcontroller
 
-enum class Task(val code: Int) {
-    Sit(1)
+enum class Task(val command: String) {
+    SitDown("COMMAND_SIT_DOWN"),
+    StandUp("COMMAND_STAND_UP"),
+    MakeAParty("COMMAND_MAKE_PARTY")
 }

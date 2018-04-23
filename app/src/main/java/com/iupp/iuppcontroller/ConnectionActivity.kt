@@ -26,10 +26,9 @@ class ConnectionActivity : AppCompatActivity(), SocketCallback {
         if (code == SocketCode.ConnectionCompletedCode) {
             runOnUiThread {
                 startActivity(
-                        Intent(this, ControllerActivity::class.java).apply {
-                            putExtra("host", host!!)
-                            putExtra("port", port!!)
-                        }
+                        Intent(this, ControllerActivity::class.java)
+                                .putExtra("host", host!!)
+                                .putExtra("port", port!!)
                 )
             }
         }

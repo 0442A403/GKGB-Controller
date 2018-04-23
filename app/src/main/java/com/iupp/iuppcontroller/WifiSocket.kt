@@ -2,13 +2,10 @@ package com.iupp.iuppcontroller
 
 import android.os.AsyncTask
 import android.util.Log
+import java.io.*
 import java.net.Socket;
-import java.io.BufferedReader;
-import java.io.InputStreamReader
-import java.io.OutputStream;
-import java.io.Serializable
 import java.net.InetSocketAddress
-
+import java.util.*
 
 
 class WifiSocket(private val host: String,
@@ -34,36 +31,33 @@ class WifiSocket(private val host: String,
             outStream = socket!!.getOutputStream()
 
             if (!socket!!.isConnected) {
-                socket!!.close()
-                inStream!!.close()
-                outStream!!.close()
+                close()
+                Log.e("IUPPError", "#233")
                 callback.callback(SocketCode.ConnectionErrorCode)
                 return null
             }
+            callback.callback(SocketCode.ConnectionCompletedCode)
             if (checkConnection) {
-                outStream!!.write(disconnectionMsg.toByteArray())
-                Log.i("IUPPDebug", "1")
+                disconnect()
+                return null
             }
-            Log.i("IUPPDebug", "2")
             while (socket!!.isConnected && connection) {
-                Log.i("IUPPDebug", "3")
-                val data = inStream!!.readLine()
-                Log.i("IUPPSocket", "Message: $data")
-                if (checkConnection && data.toString() == disconnectionMsg) {
-                    callback.callback(SocketCode.ConnectionCompletedCode)
-                    break
-                }
+                val data =
+                        if (inStream!!.ready())
+                            inStream!!.readLine()
+                        else
+                            null
+                if (data != null)
+                    Log.i("IUPPSocket", "Message: $data")
                 if (actualTask != null) {
-                    outStream!!.write(actualTask!!.code)
+                    outStream!!.write(actualTask!!.command.toByteArray())
+                    Log.i("IUPPSocket", "Command: ${actualTask!!.command}")
                     actualTask = null
                 }
             }
         } catch (e: Exception) {
             callback.callback(SocketCode.ConnectionErrorCode)
         }
-        socket?.close()
-        inStream?.close()
-        outStream?.close()
         return null
     }
 
@@ -89,7 +83,14 @@ class WifiSocket(private val host: String,
         actualTask = task
     }
 
+    private fun close() {
+        socket?.close()
+        inStream?.close()
+        outStream?.close()
+    }
+
     fun disconnect() {
-        socket!!.close()
+        outStream!!.write(disconnectionMsg.toByteArray())
+        close()
     }
 }
