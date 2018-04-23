@@ -9,10 +9,14 @@ import android.widget.Button
 import android.widget.Toast
 
 class TaskButtonAdapter(private val commands: Array<Command>,
-                        private val context: Context): BaseAdapter() {
+                        private val context: Context,
+                        private val onTaskPressedListener: OnTaskPressedListener): BaseAdapter() {
     override fun getView(p0: Int, p1: View?, p2: ViewGroup?): View {
         val button = Button(context)
         button.text = commands[p0].name
+        button.setOnClickListener {
+            onTaskPressedListener.onTaskPressed(commands[p0].task)
+        }
         return button
     }
 
@@ -21,7 +25,7 @@ class TaskButtonAdapter(private val commands: Array<Command>,
     }
 
     override fun getItemId(p0: Int): Long {
-        return commands[p0].task.code.toLong()
+        return commands[p0].task.command.hashCode().toLong()
     }
 
     override fun getCount(): Int {

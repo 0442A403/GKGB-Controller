@@ -8,38 +8,46 @@ import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_controller.*
 
 
-class ControllerActivity: Activity(), SocketCallback {
+class ControllerActivity: Activity(), SocketCallback, OnTaskPressedListener {
     private var wifiSocket: WifiSocket? = null
     private var connectionSignal = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.i("IUPPInformation", "Controller activity has started with params: " +
+                "host: ${intent.getStringExtra("host")}, " +
+                "port: ${intent.getIntExtra("port", -1)}")
         wifiSocket = WifiSocket(intent.getStringExtra("host"),
                 intent.getIntExtra("port", -1),
                 this)
         wifiSocket!!.execute()
         setContentView(R.layout.activity_controller)
-        buttonPanel.setSettings()
+        val commands = arrayOf(
+                Command("Sit down", Task.SitDown),
+                Command("Stand Up", Task.StandUp),
+                Command("Make a party", Task.MakeAParty),
+                Command("Step forward", Task.StepForward),
+                Command("Stop", Task.Stop)
+        )
+        buttonPanel.adapter = TaskButtonAdapter(commands, this@ControllerActivity, this)
+        buttonPanel.numColumns = 2
+        buttonPanel.verticalSpacing = 5
+        buttonPanel.horizontalSpacing = 5
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
         wifiSocket?.disconnect()
+        super.onBackPressed()
     }
 
-    private fun GridView.setSettings() {
-        val commands = arrayOf(Command("Sit", Task.Sit))
-        this.adapter = TaskButtonAdapter(commands, this@ControllerActivity)
-        this.setOnItemClickListener { adapterView, _, i, _ ->
-            while (!connectionSignal)
-                wifiSocket!!.setTask((adapterView.getItemAtPosition(i) as Command).task)
-        }
-        this.numColumns = 3
-        this.verticalSpacing = 5
-        this.horizontalSpacing = 5
+    override fun onTaskPressed(task: Task) {
+        while (!connectionSignal);
+        Log.i("IUPPDebug", "New task: ${task.name}")
+        wifiSocket!!.setTask(task)
+
     }
 
     override fun callback(code: SocketCode) {
-        Log.i("IUPPInformation", "callback")
+        Log.i("IUPPInformation", "callback ${code.name}")
         runOnUiThread {
             if (code == SocketCode.ConnectionCompletedCode) {
                 Toast.makeText(this, "Сокет успешно создан!", Toast.LENGTH_SHORT).show()
