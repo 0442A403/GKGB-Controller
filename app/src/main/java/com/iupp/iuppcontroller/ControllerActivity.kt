@@ -9,13 +9,13 @@ import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
 import com.iupp.iuppcontroller.Joystick.JoystickListener
-import kotlinx.android.synthetic.main.activity_controller_test.*
+import kotlinx.android.synthetic.main.activity_controller.*
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
 
-class ControllerActivityTest : AppCompatActivity(), JoystickListener, OnTaskPressedListener,
+class ControllerActivity : AppCompatActivity(), JoystickListener, OnTaskPressedListener,
         SocketCallback{
     private var wifiSocket: WifiSocket? = null
     private var connectionSignal = false
@@ -29,7 +29,7 @@ class ControllerActivityTest : AppCompatActivity(), JoystickListener, OnTaskPres
                 intent.getIntExtra("port", -1),
                 this)
         wifiSocket!!.execute()
-        setContentView(R.layout.activity_controller_test)
+        setContentView(R.layout.activity_controller)
         robotState.text = "Стою"
         joystick.setJoystickListener(this)
         val commandArray = arrayOf(
