@@ -1,35 +1,22 @@
 package com.iupp.iuppcontroller
 
-import android.content.Context
-import android.util.Log
-import android.view.View
+import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.BaseAdapter
-import android.widget.Button
-import android.widget.Toast
 
 class TaskButtonAdapter(private val commands: Array<Command>,
-                        private val context: Context,
-                        private val onTaskPressedListener: OnTaskPressedListener): BaseAdapter() {
-    override fun getView(p0: Int, p1: View?, p2: ViewGroup?): View {
-        val button = Button(context)
-        button.text = commands[p0].name
-        button.setOnClickListener {
-            onTaskPressedListener.onTaskPressed(commands[p0].task)
-        }
-        return button
+                        private val onTaskPressedListener: OnTaskPressedListener): RecyclerView.Adapter<TaskButton>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskButton {
+        val view = (LayoutInflater
+                .from(parent.context)
+                .inflate(R.layout.task_button, parent, false) as ViewGroup)
+        return TaskButton(view)
     }
 
-    override fun getItem(p0: Int): Any? {
-        return commands[p0]
-    }
+    override fun getItemCount(): Int = commands.size
 
-    override fun getItemId(p0: Int): Long {
-        return commands[p0].task.command.hashCode().toLong()
-    }
-
-    override fun getCount(): Int {
-        return commands.size
+    override fun onBindViewHolder(holder: TaskButton, position: Int) {
+        holder.setData(commands[position], onTaskPressedListener)
     }
 }
 

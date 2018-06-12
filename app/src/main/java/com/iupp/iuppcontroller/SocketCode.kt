@@ -1,9 +1,20 @@
 package com.iupp.iuppcontroller
 
 enum class SocketCode {
-    ConnectionErrorCode,
-    TimeoutErrorCode,
-    RuntimeConnectionErrorCode,
-    ConnectionCompletedCode,
-    DisconnectionCode
+    ConnectionError,
+    TimeoutError,
+    RuntimeConnectionError,
+    ConnectionCompleted,
+    Disconnection,
+    MoveForward,
+    MoveRightForward,
+    MoveRight,
+    MoveRightBack,
+    MoveBack,
+    MoveLeftBack,
+    MoveLeft,
+    MoveLeftForward,
+    Party,
+    SitDown,
+    StandUp
 }

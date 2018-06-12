@@ -1,8 +1,8 @@
 package com.iupp.iuppcontroller
 
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_connection.*
@@ -12,7 +12,6 @@ class ConnectionActivity : AppCompatActivity(), SocketCallback {
     private var port: Int? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_connection)
         connect_button.setOnClickListener {
             connect(host_editText.text.toString(),
@@ -23,21 +22,22 @@ class ConnectionActivity : AppCompatActivity(), SocketCallback {
     override fun callback(code: SocketCode) {
         Log.i("IUPPCallback", "callback ${code.name}")
         connect_button.isClickable = true
-        if (code == SocketCode.ConnectionCompletedCode) {
+        if (code == SocketCode.ConnectionCompleted) {
             runOnUiThread {
                 startActivity(
-                        Intent(this, ControllerActivity::class.java)
+                        Intent(this, ControllerActivityTest::class.java)
                                 .putExtra("host", host!!)
                                 .putExtra("port", port!!)
                 )
             }
         }
-        else if (code == SocketCode.ConnectionErrorCode
-                || code == SocketCode.TimeoutErrorCode
-                || code == SocketCode.RuntimeConnectionErrorCode) {
+        else if (code == SocketCode.ConnectionError
+                || code == SocketCode.TimeoutError
+                || code == SocketCode.RuntimeConnectionError) {
             Log.i("IUPPError", code.name)
             runOnUiThread {
-                Toast.makeText(this@ConnectionActivity, "Не удалось подключиться", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@ConnectionActivity,
+                        "Не удалось подключиться", Toast.LENGTH_LONG).show()
             }
         }
     }

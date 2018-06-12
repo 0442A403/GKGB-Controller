@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">GKGB</string>
+    <string name="state">Состояние:</string>
+    <string name="commands">Команды</string>
 </resources>
