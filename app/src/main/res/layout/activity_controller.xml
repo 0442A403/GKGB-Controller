@@ -86,7 +86,6 @@
                 android:id="@+id/stateImageWrapper"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="invisible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/robotState">
@@ -95,6 +94,7 @@
                     android:id="@+id/stateImage"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
+                    android:src="@drawable/arrow"
                     tools:ignore="ContentDescription" />
 
             </FrameLayout>
