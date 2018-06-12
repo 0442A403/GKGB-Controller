@@ -9,16 +9,14 @@ import java.io.Serializable
 import java.net.InetSocketAddress
 import java.net.Socket
 
-
 class WifiSocket(private val host: String,
                  private val port: Int,
                  private val callback: SocketCallback,
                  private val checkConnection: Boolean = false): AsyncTask<Void, SocketCode, Void>(), Serializable {
     private val timeout = 2000
-    private var socket: Socket = Socket()
+    private val socket: Socket = Socket()
     private var inStream: BufferedReader? = null
     private var outStream: OutputStream? = null
-    private var connection = true
     private var actualTask: SocketCode? = null
     override fun doInBackground(vararg p0: Void?): Void? {
         try {
@@ -38,7 +36,7 @@ class WifiSocket(private val host: String,
                 disconnect()
                 return null
             }
-            while (socket.isConnected && connection) {
+            while (socket.isConnected) {
                 val data =
                         if (inStream!!.ready())
                             inStream!!.readLine()
@@ -65,17 +63,7 @@ class WifiSocket(private val host: String,
         if (values.isEmpty())
             return
         val msg = values[0]!!
-        when (msg) {
-            SocketCode.ConnectionCompleted -> {
-                callback.callback(SocketCode.ConnectionCompleted)
-                return
-            }
-            SocketCode.Disconnection -> {
-                callback.callback(SocketCode.Disconnection)
-                connection = false
-                return
-            }
-        }
+        callback.callback(msg)
     }
 
     fun send(socketCode: SocketCode) {

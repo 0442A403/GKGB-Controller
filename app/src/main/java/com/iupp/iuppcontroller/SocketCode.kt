@@ -8,13 +8,13 @@ enum class SocketCode {
     Disconnection,
     MoveForward,
     MoveRightForward,
-    MoveRight,
     MoveRightBack,
     MoveBack,
     MoveLeftBack,
-    MoveLeft,
     MoveLeftForward,
     Party,
     SitDown,
-    StandUp
+    StandUp,
+    Stop,
+    CompletingTask
 }
