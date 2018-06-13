@@ -2,10 +2,12 @@ package com.iupp.iuppcontroller
 
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_connection.*
+import kotlinx.android.synthetic.main.activity_controller.*
 
 class ConnectionActivity : AppCompatActivity(), SocketCallback {
     private var host: String? = null
@@ -21,6 +23,7 @@ class ConnectionActivity : AppCompatActivity(), SocketCallback {
 
     override fun callback(code: SocketCode) {
         Log.i("IUPPCallback", "callback ${code.name}")
+
         connect_button.isClickable = true
         if (code == SocketCode.ConnectionCompleted) {
             runOnUiThread {
@@ -36,15 +39,15 @@ class ConnectionActivity : AppCompatActivity(), SocketCallback {
                 || code == SocketCode.RuntimeConnectionError) {
             Log.i("IUPPError", code.name)
             runOnUiThread {
-                Toast.makeText(this@ConnectionActivity,
-                        "Не удалось подключиться", Toast.LENGTH_LONG).show()
+                Snackbar.make(connectionLayout,
+                        "Не удалось подключиться", Snackbar.LENGTH_LONG).show()
             }
         }
     }
 
     private fun connect(host: String, port: String) {
         if (host.isEmpty() || port.isEmpty()) {
-            Toast.makeText(this, "Не удалось подключиться", Toast.LENGTH_SHORT).show()
+            Snackbar.make(connectionLayout, "Не удалось подключиться", Snackbar.LENGTH_SHORT).show()
             return
         }
         connect_button.isClickable = false

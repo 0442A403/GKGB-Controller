@@ -9,7 +9,6 @@ import java.io.Serializable
 import java.net.InetSocketAddress
 import java.net.Socket
 
-
 class WifiSocket(private val host: String,
                  private val port: Int,
                  private val callback: SocketCallback,
@@ -18,12 +17,14 @@ class WifiSocket(private val host: String,
     private var socket: Socket = Socket()
     private var inStream: BufferedReader? = null
     private var outStream: OutputStream? = null
-    private var connection = true
+    private var connection = false
     private var actualTask: SocketCode? = null
     override fun doInBackground(vararg p0: Void?): Void? {
         try {
-            Log.i("IUPPSocket", "Creating socket with params: host - $host, port - $port")
+            Log.i("IUPPSocket", "Creating socket with params: host - |$host|, port - $port")
+//            socket = Socket(host, port)
             socket.connect(InetSocketAddress(host, port), timeout)
+            connection = true
 
             inStream = BufferedReader(InputStreamReader(socket.getInputStream()))
             outStream = socket.getOutputStream()
@@ -55,6 +56,7 @@ class WifiSocket(private val host: String,
                 }
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             callback.callback(SocketCode.ConnectionError)
         }
         return null
