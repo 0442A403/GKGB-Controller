@@ -20,17 +20,10 @@ class WifiSocket(private val host: String,
     private var actualTask: SocketCode? = null
     override fun doInBackground(vararg p0: Void?): Void? {
         try {
-            Log.i("IUPPSocket", "Creating socket with params: host - $host, port - $port")
+            Log.i("IUPPSocket", "Creating socket with params: host - |$host|, port - $port")
             socket.connect(InetSocketAddress(host, port), timeout)
-
             inStream = BufferedReader(InputStreamReader(socket.getInputStream()))
             outStream = socket.getOutputStream()
-
-            if (!socket.isConnected) {
-                close()
-                callback.callback(SocketCode.ConnectionError)
-                return null
-            }
             callback.callback(SocketCode.ConnectionCompleted)
             if (checkConnection) {
                 disconnect()
@@ -46,13 +39,14 @@ class WifiSocket(private val host: String,
                     Log.i("IUPPSocket", "Message: $data")
                     onProgressUpdate(SocketCode.valueOf(data))
                 }
-                if (data != null) {
+                if (actualTask != null) {
                     outStream!!.write(actualTask!!.name.toByteArray())
                     Log.i("IUPPSocket", "Command: ${actualTask!!.name}")
                     actualTask = null
                 }
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             callback.callback(SocketCode.ConnectionError)
         }
         return null
@@ -76,7 +70,7 @@ class WifiSocket(private val host: String,
         outStream?.close()
     }
 
-    fun disconnect() {
+    private fun disconnect() {
         outStream!!.write(SocketCode.Disconnection.name.toByteArray())
         close()
     }

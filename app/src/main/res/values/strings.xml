@@ -2,4 +2,9 @@
     <string name="app_name">GKGB</string>
     <string name="state">Состояние:</string>
     <string name="commands">Команды</string>
+    <string name="appName">GKGB</string>
+    <string name="defaultPort">9002</string>
+    <string name="portTitle">Port:</string>
+    <string name="hostTitle">Host:</string>
+    <string name="connectButtonText">Connect!</string>
 </resources>

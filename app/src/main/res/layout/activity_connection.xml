@@ -5,12 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ConnectionActivity"
-    android:background="@color/colorPrimary">
+    android:background="@color/colorPrimary"
+    android:id="@+id/connectionLayout">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="GKGB"
+        android:text="@string/appName"
         android:textColor="@color/white"
         android:textSize="32sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -40,7 +41,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="20dp"
-            android:text="Host:"
+            android:text="@string/hostTitle"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -56,7 +57,7 @@
             android:layout_marginStart="40dp"
             android:textColor="@color/white"
             android:textSize="16sp"
-            android:backgroundTint="@color/colorAccent"
+            app:backgroundTint="@color/colorAccent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/host_title"
@@ -74,7 +75,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="20dp"
-            android:text="Port:"
+            android:text="@string/portTitle"
             android:gravity="center"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -89,8 +90,8 @@
             android:layout_marginLeft="40dp"
             android:layout_marginRight="40dp"
             android:layout_marginStart="40dp"
-            android:text="9002"
-            android:backgroundTint="@color/colorAccent"
+            android:text="@string/defaultPort"
+            app:backgroundTint="@color/colorAccent"
             android:textColor="@color/white"
             android:gravity="center"
             android:inputType="number"
@@ -109,7 +110,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="20dp"
-            android:text="Connect!"
+            android:text="@string/connectButtonText"
             android:textSize="14sp" />
 
     </LinearLayout>
