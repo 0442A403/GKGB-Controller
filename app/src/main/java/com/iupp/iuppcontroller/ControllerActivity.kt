@@ -15,8 +15,8 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 
-class ControllerActivity : AppCompatActivity(), JoystickListener, OnTaskPressedListener,
-        SocketCallback{
+class ControllerActivity : AppCompatActivity(),
+        JoystickListener, OnTaskPressedListener, SocketCallback{
     private var wifiSocket: WifiSocket? = null
     private var connectionSignal = false
     var rotationAnimation: RotateAnimation? = null
@@ -54,7 +54,7 @@ class ControllerActivity : AppCompatActivity(), JoystickListener, OnTaskPressedL
         joystick.stateAngle = null
         rotationAnimation = null
         stateImage.setImageBitmap(null)
-        joystick.setCenter(0, 0)
+//        joystick.setCenter(0, 0)
     }
 
     override fun callback(code: SocketCode) {
