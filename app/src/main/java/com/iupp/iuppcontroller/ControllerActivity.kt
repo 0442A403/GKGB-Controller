@@ -20,6 +20,7 @@ class ControllerActivity : AppCompatActivity(), JoystickListener, OnTaskPressedL
     private var wifiSocket: WifiSocket? = null
     private var connectionSignal = false
     var rotationAnimation: RotateAnimation? = null
+    private var state = State.Staying
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.i("IUPPInformation", "Controller activity has started with params: " +
@@ -45,25 +46,43 @@ class ControllerActivity : AppCompatActivity(), JoystickListener, OnTaskPressedL
         while (!connectionSignal);
         Log.i("IUPPDebug", "New task: ${socketCode.name}")
         wifiSocket!!.send(socketCode)
+        setDefaultState()
+    }
+
+    private fun setDefaultState() {
+        stateImageWrapper.visibility = View.INVISIBLE
+        joystick.stateAngle = null
+        rotationAnimation = null
+        stateImage.setImageBitmap(null)
+        joystick.setCenter(0, 0)
     }
 
     override fun callback(code: SocketCode) {
         Log.i("IUPPInformation", "callback ${code.name}")
         runOnUiThread {
-            if (code == SocketCode.ConnectionCompleted) {
-                Snackbar.make(controllerLayout, "Сокет успешно создан!", Snackbar.LENGTH_SHORT).show()
-                connectionSignal = true
-            } else if (code == SocketCode.RuntimeConnectionError
-                    || code == SocketCode.Disconnection) {
-                Snackbar.make(controllerLayout, "Соединение разорвано", Snackbar.LENGTH_LONG).show()
-                finish()
-            } else if (code == SocketCode.TimeoutError
-                    || code == SocketCode.ConnectionError) {
-                Snackbar.make(controllerLayout, "Не удалось подключиться", Snackbar.LENGTH_LONG).show()
-                finish()
-            }
-            else {
-                throw Exception("Unknown callback from socket")
+            when (code) {
+                SocketCode.ConnectionCompleted -> {
+                    Snackbar.make(controllerLayout, "Сокет успешно создан!", Snackbar.LENGTH_SHORT).show()
+                    connectionSignal = true
+                }
+                SocketCode.RuntimeConnectionError, SocketCode.Disconnection -> {
+                    Snackbar.make(controllerLayout, "Соединение разорвано", Snackbar.LENGTH_LONG).show()
+                    finish()
+                }
+                SocketCode.TimeoutError, SocketCode.ConnectionError -> {
+                    Snackbar.make(controllerLayout, "Не удалось подключиться", Snackbar.LENGTH_LONG).show()
+                    finish()
+                }
+                SocketCode.CompletingTask -> {
+                    if (state == State.Staying || state == State.Sitting)
+                        onDown()
+                        //зеленый кружок
+                    else
+                        stateImage.setImageResource(R.drawable.arrow_green)
+                }
+                else -> {
+                    throw Exception("Unknown callback from socket")
+                }
             }
         }
     }
@@ -73,10 +92,7 @@ class ControllerActivity : AppCompatActivity(), JoystickListener, OnTaskPressedL
         joystick.lastOffset = offset
         joystick.lastDegrees = degrees
         if (offset < 0.75) {
-            stateImageWrapper.visibility = View.INVISIBLE
-            joystick.stateAngle = null
-            rotationAnimation = null
-            stateImage.setImageBitmap(null)
+            setDefaultState()
         }
         else if (rotationAnimation == null || rotationAnimation!!.hasEnded()) {
             val newAngle = when (degrees) {
@@ -115,7 +131,7 @@ class ControllerActivity : AppCompatActivity(), JoystickListener, OnTaskPressedL
             }
             if (stateImageWrapper.visibility != View.VISIBLE) {
                 stateImageWrapper.visibility = View.VISIBLE
-                stateImage.setImageResource(R.drawable.arrow)
+                stateImage.setImageResource(R.drawable.arrow_orange)
             }
             rotationAnimation!!.interpolator = LinearInterpolator()
             rotationAnimation!!.fillAfter = true
@@ -132,18 +148,38 @@ class ControllerActivity : AppCompatActivity(), JoystickListener, OnTaskPressedL
     override fun onUp() {
         Log.i("GKGBInformation", "onUp")
         if (joystick.lastOffset!! >= 0.75) {
-            stateImage.setImageResource(R.drawable.arrow)
+            stateImage.setImageResource(R.drawable.arrow_light_orange)
             robotState.text = "Иду"
             val angle = when (joystick.stateAngle!!) {
-                60f -> 30
-                0f -> 90
-                -60f -> 150
-                -120f -> 210
-                -180f -> 270
-                180f -> 270
-                else -> 330
+                60f -> {
+                    wifiSocket!!.send(SocketCode.MoveRightForward)
+                    30
+                }
+                0f -> {
+                    wifiSocket!!.send(SocketCode.MoveForward)
+                    90
+                }
+                -60f -> {
+                    wifiSocket!!.send(SocketCode.MoveLeftForward)
+                    150
+                }
+                -120f -> {
+                    wifiSocket!!.send(SocketCode.MoveLeftBack)
+                    210
+                }
+                -180f -> {
+                    wifiSocket!!.send(SocketCode.MoveBack)
+                    270
+                }
+                180f -> {
+                    wifiSocket!!.send(SocketCode.MoveBack)
+                    270
+                }
+                else -> {
+                    wifiSocket!!.send(SocketCode.MoveRightBack)
+                    330
+                }
             } * PI / 180
-            Log.i("GKGBInformation", "degree: $angle")
             joystick.setCenter((cos(angle) * joystick.radius * 0.9).toInt(),
                     -(sin(angle) * joystick.radius * 0.9).toInt())
         }
@@ -153,5 +189,9 @@ class ControllerActivity : AppCompatActivity(), JoystickListener, OnTaskPressedL
             robotState.text = "Стою"
         }
         rotationAnimation = null
+    }
+
+    private enum class State {
+        Walking, Staying, Sitting
     }
 }
