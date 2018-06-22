@@ -36,7 +36,8 @@ class ControllerActivity : AppCompatActivity(),
         val commandArray = arrayOf(
                 Command("Сядь", SocketCode.SitDown),
                 Command("Встань", SocketCode.StandUp),
-                Command("Вечеринка", SocketCode.Party)
+                Command("Вечеринка", SocketCode.Party),
+                Command("Тест", SocketCode.Test)
         )
         grid.adapter = TaskButtonAdapter(commandArray, this)
         grid.layoutManager = GridLayoutManager(this, 2)
@@ -46,7 +47,7 @@ class ControllerActivity : AppCompatActivity(),
         while (!connectionSignal);
         Log.i("IUPPDebug", "New task: ${socketCode.name}")
         wifiSocket!!.send(socketCode)
-        setDefaultState()
+//        setDefaultState()
     }
 
     private fun setDefaultState() {

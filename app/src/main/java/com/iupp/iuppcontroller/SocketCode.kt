@@ -16,5 +16,6 @@ enum class SocketCode {
     SitDown,
     StandUp,
     Stop,
-    CompletingTask
+    CompletingTask,
+    Test
 }

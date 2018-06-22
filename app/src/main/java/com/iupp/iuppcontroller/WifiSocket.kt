@@ -5,14 +5,13 @@ import android.util.Log
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.OutputStream
-import java.io.Serializable
 import java.net.InetSocketAddress
 import java.net.Socket
 
 class WifiSocket(private val host: String,
                  private val port: Int,
                  private val callback: SocketCallback,
-                 private val checkConnection: Boolean = false): AsyncTask<Void, SocketCode, Void>(), Serializable {
+                 private val checkConnection: Boolean = false): AsyncTask<Void, SocketCode, Void>() {
     private val timeout = 2000
     private val socket: Socket = Socket()
     private var inStream: BufferedReader? = null
