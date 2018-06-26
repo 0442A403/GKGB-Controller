@@ -192,6 +192,11 @@ class ControllerActivity : AppCompatActivity(),
         rotationAnimation = null
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        wifiSocket?.disconnect()
+    }
+
     private enum class State {
         Walking, Staying, Sitting
     }

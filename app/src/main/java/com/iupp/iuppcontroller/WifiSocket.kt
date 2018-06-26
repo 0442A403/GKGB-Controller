@@ -69,7 +69,7 @@ class WifiSocket(private val host: String,
         outStream?.close()
     }
 
-    private fun disconnect() {
+    fun disconnect() {
         outStream!!.write(SocketCode.Disconnection.name.toByteArray())
         close()
     }

@@ -14,6 +14,7 @@ class ConnectionActivity : AppCompatActivity(), SocketCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_connection)
         connect_button.setOnClickListener {
+            Log.i("GKGB", "Trying to connect")
             connect(host_editText.text.toString(),
                     port_editText.text.toString())
         }
@@ -50,6 +51,7 @@ class ConnectionActivity : AppCompatActivity(), SocketCallback {
         connect_button.isClickable = false
         this.host = host
         this.port = port.toInt()
+        Log.d("GKGB", "12321321321")
         WifiSocket(host, port.toInt(), this, true).execute()
     }
 }
