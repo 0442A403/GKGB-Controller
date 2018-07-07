@@ -350,7 +350,7 @@ public class Joystick extends FrameLayout {
     }
 
     public void setCenter(int xCenter, int yCenter) {
-        draggedChild.animate()
+        getChildAt(0).animate()
                 .translationX(xCenter).translationY(yCenter)
                 .setDuration(STICK_SETTLE_DURATION_MS)
                 .setInterpolator(STICK_SETTLE_INTERPOLATOR)

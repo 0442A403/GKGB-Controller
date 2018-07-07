@@ -17,10 +17,12 @@ import kotlin.math.sin
 
 class ControllerActivity : AppCompatActivity(),
         JoystickListener, OnTaskPressedListener, SocketCallback{
+
     private var wifiSocket: WifiSocket? = null
     private var connectionSignal = false
     var rotationAnimation: RotateAnimation? = null
     private var state = State.Staying
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.i("IUPPInformation", "Controller activity has started with params: " +
@@ -47,7 +49,22 @@ class ControllerActivity : AppCompatActivity(),
         while (!connectionSignal);
         Log.i("IUPPDebug", "New task: ${socketCode.name}")
         wifiSocket!!.send(socketCode)
-//        setDefaultState()
+        setDefaultState()
+        joystick.setCenter(0, 0)
+        when (socketCode) {
+            SocketCode.StandUp -> {
+                state = State.Staying
+                robotState.text = "Стою"
+            }
+            SocketCode.SitDown -> {
+                state= State.Sitting
+                robotState.text = "Сижу"
+            }
+            SocketCode.Party -> {
+                state = State.Staying
+                robotState.text = "Вечеринка"
+            }
+        }
     }
 
     private fun setDefaultState() {
@@ -55,7 +72,6 @@ class ControllerActivity : AppCompatActivity(),
         joystick.stateAngle = null
         rotationAnimation = null
         stateImage.setImageBitmap(null)
-        joystick.performClick()
     }
 
     override fun callback(code: SocketCode) {
@@ -143,7 +159,6 @@ class ControllerActivity : AppCompatActivity(),
 
     override fun onDown() {
         Log.i("GKGBInformation", "onDown")
-
     }
 
     override fun onUp() {
@@ -151,6 +166,7 @@ class ControllerActivity : AppCompatActivity(),
         if (joystick.lastOffset!! >= 0.75) {
             stateImage.setImageResource(R.drawable.arrow_light_orange)
             robotState.text = "Иду"
+            state = State.Walking
             val angle = when (joystick.stateAngle!!) {
                 60f -> {
                     wifiSocket!!.send(SocketCode.MoveRightForward)
@@ -185,9 +201,12 @@ class ControllerActivity : AppCompatActivity(),
                     -(sin(angle) * joystick.radius * 0.9).toInt())
         }
         else {
+            setDefaultState()
+            joystick.setCenter(0, 0)
             stateImage.setImageBitmap(null)
             stateImageWrapper.visibility = View.INVISIBLE
             robotState.text = "Стою"
+            state = State.Staying
         }
         rotationAnimation = null
     }
