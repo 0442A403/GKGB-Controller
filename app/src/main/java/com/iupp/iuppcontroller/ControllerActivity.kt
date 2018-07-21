@@ -36,6 +36,8 @@ class ControllerActivity : AppCompatActivity(),
         robotState.text = "Стою"
         joystick.setJoystickListener(this)
         val commandArray = arrayOf(
+                Command("Повернись влево", SocketCode.TurnLeft),
+                Command("Повернись вправо", SocketCode.TurnRight),
                 Command("Сядь", SocketCode.SitDown),
                 Command("Встань", SocketCode.StandUp),
                 Command("Вечеринка", SocketCode.Party),
@@ -64,6 +66,11 @@ class ControllerActivity : AppCompatActivity(),
                 state = State.Staying
                 robotState.text = "Вечеринка"
             }
+            SocketCode.TurnRight, SocketCode.TurnLeft -> {
+                state = State.Turning
+                robotState.text = "Поворачиваюсь"
+            }
+            else -> {}
         }
     }
 
@@ -207,6 +214,7 @@ class ControllerActivity : AppCompatActivity(),
             stateImageWrapper.visibility = View.INVISIBLE
             robotState.text = "Стою"
             state = State.Staying
+            wifiSocket!!.send(SocketCode.StandUp)
         }
         rotationAnimation = null
     }
@@ -217,6 +225,6 @@ class ControllerActivity : AppCompatActivity(),
     }
 
     private enum class State {
-        Walking, Staying, Sitting
+        Walking, Staying, Sitting, Turning
     }
 }

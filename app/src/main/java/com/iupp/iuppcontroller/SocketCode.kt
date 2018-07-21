@@ -17,5 +17,7 @@ enum class SocketCode {
     StandUp,
     Stop,
     CompletingTask,
-    Test
+    Test,
+    TurnRight,
+    TurnLeft
 }
