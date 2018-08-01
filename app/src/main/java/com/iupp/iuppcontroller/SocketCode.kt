@@ -18,6 +18,6 @@ enum class SocketCode {
     Stop,
     CompletingTask,
     Test,
-    TurnRight,
-    TurnLeft
+    TurnCounterclockwise,
+    TurnClockwise
 }

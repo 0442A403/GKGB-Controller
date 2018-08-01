@@ -4,7 +4,6 @@ import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.util.Log
-import android.view.View
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
@@ -20,24 +19,24 @@ class ControllerActivity : AppCompatActivity(),
 
     private var wifiSocket: WifiSocket? = null
     private var connectionSignal = false
-    var rotationAnimation: RotateAnimation? = null
+    private var rotationAnimation: RotateAnimation? = null
     private var state = State.Staying
+    private var picking = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.i("IUPPInformation", "Controller activity has started with params: " +
+        Log.i("GKGBInformation", "Controller activity has started with params: " +
                 "host: ${intent.getStringExtra("host")}, " +
                 "port: ${intent.getIntExtra("port", -1)}")
         wifiSocket = WifiSocket(intent.getStringExtra("host"),
-                intent.getIntExtra("port", -1),
-                this)
+                intent.getIntExtra("port", -1), this)
         wifiSocket!!.execute()
         setContentView(R.layout.activity_controller)
         robotState.text = "Стою"
         joystick.setJoystickListener(this)
         val commandArray = arrayOf(
-                Command("Повернись влево", SocketCode.TurnLeft),
-                Command("Повернись вправо", SocketCode.TurnRight),
+                Command("Повернись влево", SocketCode.TurnClockwise),
+                Command("Повернись вправо", SocketCode.TurnCounterclockwise),
                 Command("Сядь", SocketCode.SitDown),
                 Command("Встань", SocketCode.StandUp),
                 Command("Вечеринка", SocketCode.Party),
@@ -49,10 +48,10 @@ class ControllerActivity : AppCompatActivity(),
 
     override fun onTaskPressed(socketCode: SocketCode) {
         while (!connectionSignal);
-        Log.i("IUPPDebug", "New task: ${socketCode.name}")
         wifiSocket!!.send(socketCode)
-        setDefaultState()
+        setDefaultJoystickState()
         joystick.setCenter(0, 0)
+        stateImage.setImageResource(R.drawable.red_circle)
         when (socketCode) {
             SocketCode.StandUp -> {
                 state = State.Staying
@@ -66,7 +65,7 @@ class ControllerActivity : AppCompatActivity(),
                 state = State.Staying
                 robotState.text = "Вечеринка"
             }
-            SocketCode.TurnRight, SocketCode.TurnLeft -> {
+            SocketCode.TurnCounterclockwise, SocketCode.TurnClockwise -> {
                 state = State.Turning
                 robotState.text = "Поворачиваюсь"
             }
@@ -74,16 +73,15 @@ class ControllerActivity : AppCompatActivity(),
         }
     }
 
-    private fun setDefaultState() {
-        stateImageWrapper.visibility = View.INVISIBLE
+    private fun setDefaultJoystickState() {
         joystick.stateAngle = null
         rotationAnimation = null
-        stateImage.setImageBitmap(null)
     }
 
     override fun callback(code: SocketCode) {
-        Log.i("IUPPInformation", "callback ${code.name}")
+        Log.i("GKGBInformation", "Callback ${code.name}")
         runOnUiThread {
+            Snackbar.make(controllerLayout, "Callback: ${code.name}", Snackbar.LENGTH_LONG)
             when (code) {
                 SocketCode.ConnectionCompleted -> {
                     Snackbar.make(controllerLayout, "Сокет успешно создан!", Snackbar.LENGTH_SHORT).show()
@@ -91,16 +89,17 @@ class ControllerActivity : AppCompatActivity(),
                 }
                 SocketCode.RuntimeConnectionError, SocketCode.Disconnection -> {
                     Snackbar.make(controllerLayout, "Соединение разорвано", Snackbar.LENGTH_LONG).show()
+                    wifiSocket!!.disconnect()
                     finish()
                 }
                 SocketCode.TimeoutError, SocketCode.ConnectionError -> {
                     Snackbar.make(controllerLayout, "Не удалось подключиться", Snackbar.LENGTH_LONG).show()
+                    wifiSocket!!.disconnect()
                     finish()
                 }
                 SocketCode.CompletingTask -> {
                     if (state == State.Staying || state == State.Sitting)
-                        onDown()
-                        //зеленый кружок
+                        stateImage.setImageResource(R.drawable.green_circle)
                     else
                         stateImage.setImageResource(R.drawable.arrow_green)
                 }
@@ -116,7 +115,8 @@ class ControllerActivity : AppCompatActivity(),
         joystick.lastOffset = offset
         joystick.lastDegrees = degrees
         if (offset < 0.75) {
-            setDefaultState()
+            setDefaultJoystickState()
+            picking = false
         }
         else if (rotationAnimation == null || rotationAnimation!!.hasEnded()) {
             val newAngle = when (degrees) {
@@ -153,10 +153,9 @@ class ControllerActivity : AppCompatActivity(),
                         RotateAnimation.RELATIVE_TO_SELF, 0.5f)
                 rotationAnimation!!.duration = 75
             }
-            if (stateImageWrapper.visibility != View.VISIBLE) {
-                stateImageWrapper.visibility = View.VISIBLE
+            if (!picking)
                 stateImage.setImageResource(R.drawable.arrow_orange)
-            }
+            picking = true
             rotationAnimation!!.interpolator = LinearInterpolator()
             rotationAnimation!!.fillAfter = true
             stateImage.startAnimation(rotationAnimation)
@@ -170,6 +169,7 @@ class ControllerActivity : AppCompatActivity(),
 
     override fun onUp() {
         Log.i("GKGBInformation", "onUp")
+        picking = false
         if (joystick.lastOffset!! >= 0.75) {
             stateImage.setImageResource(R.drawable.arrow_light_orange)
             robotState.text = "Иду"
@@ -208,10 +208,9 @@ class ControllerActivity : AppCompatActivity(),
                     -(sin(angle) * joystick.radius * 0.9).toInt())
         }
         else {
-            setDefaultState()
+            setDefaultJoystickState()
             joystick.setCenter(0, 0)
-            stateImage.setImageBitmap(null)
-            stateImageWrapper.visibility = View.INVISIBLE
+            stateImage.setImageResource(R.drawable.green_circle)
             robotState.text = "Стою"
             state = State.Staying
             wifiSocket!!.send(SocketCode.StandUp)

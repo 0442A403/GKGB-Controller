@@ -23,11 +23,16 @@ class WifiSocket(private val host: String,
             socket.connect(InetSocketAddress(host, port), timeout)
             inStream = BufferedReader(InputStreamReader(socket.getInputStream()))
             outStream = socket.getOutputStream()
-            callback.callback(SocketCode.ConnectionCompleted)
-            if (checkConnection) {
-                disconnect()
-                return null
-            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            callback.callback(SocketCode.ConnectionError)
+        }
+        callback.callback(SocketCode.ConnectionCompleted)
+        if (checkConnection) {
+            disconnect()
+            return null
+        }
+        try {
             while (socket.isConnected) {
                 val data =
                         if (inStream!!.ready())
@@ -46,7 +51,7 @@ class WifiSocket(private val host: String,
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            callback.callback(SocketCode.ConnectionError)
+            callback.callback(SocketCode.RuntimeConnectionError)
         }
         return null
     }
@@ -70,7 +75,11 @@ class WifiSocket(private val host: String,
     }
 
     fun disconnect() {
-        outStream!!.write(SocketCode.Disconnection.name.toByteArray())
+        try {
+            outStream!!.write(SocketCode.Disconnection.name.toByteArray())
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
         close()
     }
 }
